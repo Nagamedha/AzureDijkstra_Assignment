@@ -1,19 +1,19 @@
-## `README.md`
+##  README.md
 
 ```markdown
 # Cloud Computing - Programming Assignment: Implementing Dijkstra's Algorithm with Apache Spark on Azure VMs
 
 ## Overview
-This project demonstrates the implementation of Dijkstra's Shortest Path Algorithm using Apache Spark deployed on Microsoft Azure Virtual Machines (VMs).
+This project demonstrates the implementation of Dijkstra's Shortest Path Algorithm using Apache Spark, deployed and executed on Microsoft Azure Virtual Machines (VMs).
 
-The assignment explores both:
-- Spark RDD-based solution (PySpark)
-- Spark GraphX-based solution (Scala)
+The solution includes:
+- PySpark RDD-based Implementation
+- Scala GraphX-based Implementation
 
 ---
 
 ## Tech Stack Used
-- Microsoft Azure Virtual Machine (Ubuntu 20.04)
+- Microsoft Azure Virtual Machine (Ubuntu)
 - Apache Spark 3.4.1 (Standalone Mode)
 - Java 8, Scala 2.12
 - Python 3.x with PySpark
@@ -25,111 +25,118 @@ The assignment explores both:
 
 ## Folder Structure
 
+
 Dijkstra_Assignment/
 │
-├── final_Code.py                  # PySpark RDD based Dijkstra Implementation
-├── dijkstra_driver.py            # Python Dijkstra Logic using RDD Output
+├── final_Code.py                  # PySpark RDD-based Dijkstra Implementation
+├── dijkstra_driver.py            # Python logic to run Dijkstra on generated RDD outputs
 │
-├── GraphXDijkstra.scala          # GraphX based Dijkstra Implementation in Scala
-├── GraphXDijkstra.jar            # Compiled Jar for Scala Code
+├── GraphXDijkstra.scala          # GraphX-based Dijkstra Implementation in Scala
+├── GraphXDijkstra.jar            # Compiled Jar for Scala GraphX code
 │
 ├── weighted_graph.txt            # Input Graph (10K Nodes, 100K Edges)
 │
-├── shortest_paths_output.txt     # Final Output from Python RDD-based Approach
-├── graphx_output/                # Final Output from Scala GraphX-based Approach
+├── shortest_paths_output.txt     # Final Output from PySpark
+├── graphx_output/                # Output from GraphX Approach
 │
 └── README.md                     # This file
 
 
-### Execution Instructions:
+---
+
+## Execution Instructions (Step-by-step)
 
 ```
-### 1. SSH into Azure VM:
+### 1. SSH into Azure VM
+
+> NOTE:
+> - Use your own `.pem` key file that was generated while creating your Azure VM.
+> - The key name can be anything like `CloudAssignmentKey.pem` or any other name based on your VM setup.
+> - Replace `<Your-VM-Public-IP>` with your own VM's Public IP.
 
 ```bash
-ssh -i /path/to/CloudAssignmentKey.pem azureuser@<VM-Public-IP>
+ssh -i /path/to/Your-Key-File.pem azureuser@<Your-VM-Public-IP>
 ```
+---
 
-### 2. Running PySpark RDD-based Code:
+### 2. Running PySpark RDD-based Implementation
 
-#### Run Spark Job to create edges & adjacency list:
+#### Step 1: Generate Edges & Adjacency List using Spark
 ```bash
 spark-submit final_Code.py
 ```
 
-#### Then run Dijkstra logic:
+#### Step 2: Run Dijkstra Logic
 ```bash
 python3 dijkstra_driver.py
 ```
 
-Output will be in:
+#### Output Generated At:
 ```
 shortest_paths_output.txt
 ```
 
 ---
 
-### 3. Running GraphX Scala-based Code:
+### 3. Running Scala GraphX-based Implementation
 
-#### Compile:
+#### Step 1: Compile Scala Code
 ```bash
 scalac -classpath "$SPARK_HOME/jars/*" GraphXDijkstra.scala
 jar -cvf GraphXDijkstra.jar GraphXDijkstra*.class
 ```
 
-#### Run:
+#### Step 2: Execute GraphX Job using Spark
 ```bash
 spark-submit --class GraphXDijkstra --master local[*] --jars "$SPARK_HOME/jars/*" GraphXDijkstra.jar
 ```
 
-Output will be in:
+#### Output Generated At:
 ```
 graphx_output/part-00000
 ```
 
 ---
 
-## Output Sample
+## How to Prove Execution Happened on Azure VM?
 
-Python RDD Output:
-```
-Shortest distances from node 0:
-Node 0: 0
-Node 1: 12
-Node 2: 6
-...
-```
+- Show your SSH connection:
+    ```bash
+    ssh -i /path/to/Your-Key.pem azureuser@<Your-VM-Public-IP>
+    ```
 
-Scala GraphX Output:
-```
-Node 0: 0
-Node 1: 12
-Node 2: 6
-...
-```
+- Inside VM, show execution commands & outputs generated:
+    ```bash
+    ls
+    cat shortest_paths_output.txt
+    cat graphx_output/part-00000
+    ```
+
+- Additionally, you can verify that your local machine's public IP is different from Azure VM's IP:
+    ```bash
+    curl ifconfig.me   # On Local Machine
+    curl ifconfig.me   # Inside Azure VM
+    ```
 
 ---
 
 ## Challenges Faced & Learnings
 | Challenge | Solution |
 |-----------|-----------|
-| Spark errors in VM | Correct configurations & binding IP |
-| Data locality issues | Used `.coalesce(1)` to get single output file |
-| Python vs Scala output variation | Handled graph as Undirected for consistency |
-| PySpark not compatible with GraphX | Used Scala for GraphX implementation |
+| Spark initialization & binding issues | Fixed using Spark conf bindAddress |
+| Data not writing in single output file | Used `.coalesce(1)` in GraphX for single output |
+| PySpark not supporting GraphX | Used Scala GraphX for large-scale Graph Processing |
+| Different .pem file & IP setups | Clearly mentioned user-specific key and IP setup in instructions |
 
 ---
 
-## Proof of Execution on Azure VM
-- Azure VM Public IP → `20.94.43.56`
-- My local system IP → Verified via `ifconfig` & `curl ifconfig.me`
-- Output generated & saved inside Azure VM
-- Downloaded outputs via `scp` to local machine
+## Author
+
+Prepared by: *Nagamedha Sakhamuri*  
+GitHub Repository: [AzureDijkstra_Assignment](https://github.com/Nagamedha/AzureDijkstra_Assignment)
 
 ---
 
-## Contact
-Prepared by: Nagamedha Sakhamuri  
-GitHub Repo: [https://github.com/Nagamedha/AzureDijkstra_Assignment](https://github.com/Nagamedha/AzureDijkstra_Assignment)
+## Final Note:
+> Clone or Download the Repository → SSH into your own Azure VM → Place these files → Follow above steps → Execute → Output will be generated inside VM → Download if needed.
 
----
